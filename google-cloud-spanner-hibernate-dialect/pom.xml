@@ -8,13 +8,13 @@
 
     <groupId>com.linqia</groupId>
     <artifactId>google-hibernate-dialect</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Google Cloud Spanner Dialect for Hibernate ORM</name>
 
     <scm>
-        <connection>scm:git:git@github.com:saurabhLinqia/google-cloud-spanner-hibernate.git</connection>
-        <tag>google-hibernate-dialect-0.1.0</tag>
+        <connection>scm:git:git@github.com:linqia/blog-discovery.git</connection>
+        <tag>HEAD</tag>
     </scm>
 
     <parent>
