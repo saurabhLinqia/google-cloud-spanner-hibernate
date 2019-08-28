@@ -26,16 +26,16 @@ import javax.persistence.ManyToOne;
 
 /**
  * A test entity that has relationships with `TestEntity`.
- *
+ * 
  * @author Chengyuan Zhao
  */
 @Entity
 public class SubTestEntity {
 
-  @Id
-  String id;
+    @Id
+    String id;
 
-  @ManyToOne
-  @JoinColumns({@JoinColumn(name = "id1"), @JoinColumn(name = "id2")})
-  TestEntity testEntity;
+    @ManyToOne
+    @JoinColumns({ @JoinColumn(name = "id1"), @JoinColumn(name = "id2") })
+    TestEntity testEntity;
 }

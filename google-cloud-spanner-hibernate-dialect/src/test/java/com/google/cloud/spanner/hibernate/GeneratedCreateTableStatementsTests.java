@@ -33,54 +33,54 @@ import org.junit.Test;
 
 public class GeneratedCreateTableStatementsTests {
 
-  private StandardServiceRegistry registry;
+    private StandardServiceRegistry registry;
 
-  private JDBCMockObjectFactory jdbcMockObjectFactory;
+    private JDBCMockObjectFactory jdbcMockObjectFactory;
 
-  /**
-   * Set up the metadata for Hibernate to generate schema statements.
-   */
-  @Before
-  public void setup() {
-    this.jdbcMockObjectFactory = new JDBCMockObjectFactory();
-    this.jdbcMockObjectFactory.registerMockDriver();
-    this.jdbcMockObjectFactory.getMockDriver()
-        .setupConnection(this.jdbcMockObjectFactory.getMockConnection());
+    /**
+     * Set up the metadata for Hibernate to generate schema statements.
+     */
+    @Before
+    public void setup() {
+        this.jdbcMockObjectFactory = new JDBCMockObjectFactory();
+        this.jdbcMockObjectFactory.registerMockDriver();
+        this.jdbcMockObjectFactory.getMockDriver().setupConnection(
+                this.jdbcMockObjectFactory.getMockConnection());
 
-    this.registry = new StandardServiceRegistryBuilder()
-        .applySetting("hibernate.dialect", SpannerDialect.class.getName())
-        // must NOT set a driver class name so that Hibernate will use java.sql.DriverManager
-        // and discover the only mock driver we have set up.
-        .applySetting("hibernate.connection.url", "unused")
-        .applySetting("hibernate.connection.username", "unused")
-        .applySetting("hibernate.connection.password", "unused")
-        .applySetting("hibernate.hbm2ddl.auto", "create")
-        .build();
-  }
+        this.registry = new StandardServiceRegistryBuilder()
+                .applySetting("hibernate.dialect",
+                        SpannerDialect.class.getName())
+                // must NOT set a driver class name so that Hibernate will use
+                // java.sql.DriverManager
+                // and discover the only mock driver we have set up.
+                .applySetting("hibernate.connection.url", "unused")
+                .applySetting("hibernate.connection.username", "unused")
+                .applySetting("hibernate.connection.password", "unused")
+                .applySetting("hibernate.hbm2ddl.auto", "create").build();
+    }
 
-  @Test
-  public void testUnsupportedExportersNoop() {
-    Metadata metadata =
-        new MetadataSources(this.registry)
-            .addAnnotatedClass(Employee.class)
-            .buildMetadata();
+    @Test
+    public void testUnsupportedExportersNoop() {
+        Metadata metadata = new MetadataSources(this.registry)
+                .addAnnotatedClass(Employee.class).buildMetadata();
 
-    Session session = metadata.buildSessionFactory().openSession();
-    session.beginTransaction();
-    session.close();
+        Session session = metadata.buildSessionFactory().openSession();
+        session.beginTransaction();
+        session.close();
 
-    List<String> sqlStrings = this.jdbcMockObjectFactory.getMockConnection()
-        .getStatementResultSetHandler()
-        .getExecutedStatements();
+        List<String> sqlStrings = this.jdbcMockObjectFactory
+                .getMockConnection().getStatementResultSetHandler()
+                .getExecutedStatements();
 
-    assertThat(sqlStrings).containsExactly(
-        "drop index name_index",
-        "drop table Employee",
-        "drop table hibernate_sequence",
-        "create table Employee "
-            + "(id INT64 not null,name STRING(255),manager_id INT64) PRIMARY KEY (id)",
-        "create table hibernate_sequence (next_val INT64) PRIMARY KEY ()",
-        "INSERT INTO hibernate_sequence (next_val) VALUES(1)",
-        "create index name_index on Employee (name)");
-  }
+        assertThat(sqlStrings)
+                .containsExactly(
+                        "drop index name_index",
+                        "drop table Employee",
+                        "drop table hibernate_sequence",
+                        "create table Employee "
+                                + "(id INT64 not null,name STRING(255),manager_id INT64) PRIMARY KEY (id)",
+                        "create table hibernate_sequence (next_val INT64) PRIMARY KEY ()",
+                        "INSERT INTO hibernate_sequence (next_val) VALUES(1)",
+                        "create index name_index on Employee (name)");
+    }
 }

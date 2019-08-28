@@ -40,44 +40,45 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * These tests use SpannerDialect and Hibernate-core to generate the final SELECT statements that
- * are sent to the Spanner driver.
- *
+ * These tests use SpannerDialect and Hibernate-core to generate the final
+ * SELECT statements that are sent to the Spanner driver.
+ * 
  * @author Chengyuan Zhao
  */
 public class GeneratedSelectStatementsTests {
 
-  private Metadata metadata;
+    private Metadata metadata;
 
-  private StandardServiceRegistry registry;
+    private StandardServiceRegistry registry;
 
-  private JDBCMockObjectFactory jdbcMockObjectFactory;
+    private JDBCMockObjectFactory jdbcMockObjectFactory;
 
-  /**
-   * Set up the metadata for Hibernate to generate schema statements.
-   */
-  @Before
-  public void setup() {
-    this.jdbcMockObjectFactory = new JDBCMockObjectFactory();
-    this.jdbcMockObjectFactory.registerMockDriver();
-    this.jdbcMockObjectFactory.getMockDriver()
-        .setupConnection(this.jdbcMockObjectFactory.getMockConnection());
+    /**
+     * Set up the metadata for Hibernate to generate schema statements.
+     */
+    @Before
+    public void setup() {
+        this.jdbcMockObjectFactory = new JDBCMockObjectFactory();
+        this.jdbcMockObjectFactory.registerMockDriver();
+        this.jdbcMockObjectFactory.getMockDriver().setupConnection(
+                this.jdbcMockObjectFactory.getMockConnection());
 
-    this.registry = new StandardServiceRegistryBuilder()
-        .applySetting("hibernate.dialect", SpannerDialect.class.getName())
-        // must NOT set a driver class name so that Hibernate will use java.sql.DriverManager
-        // and discover the only mock driver we have set up.
-        .applySetting("hibernate.connection.url", "unused")
-        .applySetting("hibernate.connection.username", "unused")
-        .applySetting("hibernate.connection.password", "unused")
-        .applySetting("hibernate.hbm2ddl.auto", "create")
-        .build();
-    this.metadata =
-        new MetadataSources(this.registry).addAnnotatedClass(TestEntity.class)
-            .addAnnotatedClass(SubTestEntity.class).buildMetadata();
-  }
+        this.registry = new StandardServiceRegistryBuilder()
+                .applySetting("hibernate.dialect",
+                        SpannerDialect.class.getName())
+                // must NOT set a driver class name so that Hibernate will use
+                // java.sql.DriverManager
+                // and discover the only mock driver we have set up.
+                .applySetting("hibernate.connection.url", "unused")
+                .applySetting("hibernate.connection.username", "unused")
+                .applySetting("hibernate.connection.password", "unused")
+                .applySetting("hibernate.hbm2ddl.auto", "create").build();
+        this.metadata = new MetadataSources(this.registry)
+                .addAnnotatedClass(TestEntity.class)
+                .addAnnotatedClass(SubTestEntity.class).buildMetadata();
+    }
 
-  @Test
+    @Test
   public void selectLockAcquisitionTest() {
     // the translated statement must NOT show locking statements.
     testStatementTranslation(x -> {
@@ -89,7 +90,7 @@ public class GeneratedSelectStatementsTests {
         + "subtestent0_.id2 as id3_1_ from SubTestEntity subtestent0_ limit ? offset ?");
   }
 
-  @Test
+    @Test
   public void insertDmlTest() {
     TestEntity te = new TestEntity();
     IdClass id = new IdClass();
@@ -115,31 +116,31 @@ public class GeneratedSelectStatementsTests {
     }
   }
 
-  @Test
-  public void deleteDmlTest() {
-    testUpdateStatementTranslation(
-        "delete TestEntity where boolVal = true",
-        "delete from `test_table` where `boolColumn`=TRUE");
-  }
+    @Test
+    public void deleteDmlTest() {
+        testUpdateStatementTranslation(
+                "delete TestEntity where boolVal = true",
+                "delete from `test_table` where `boolColumn`=TRUE");
+    }
 
-  @Test
-  public void selectJoinTest() {
-    testReadStatementTranslation(
-        "select s from SubTestEntity s inner join s.testEntity",
-        "select subtestent0_.id as id1_1_, subtestent0_.id1 "
-            + "as id2_1_, subtestent0_.id2 as id3_1_ from SubTestEntity subtestent0_ inner "
-            + "join `test_table` testentity1_ on subtestent0_.id1=testentity1_.`ID1`"
-            + " and subtestent0_.id2=testentity1_.id2");
-  }
+    @Test
+    public void selectJoinTest() {
+        testReadStatementTranslation(
+                "select s from SubTestEntity s inner join s.testEntity",
+                "select subtestent0_.id as id1_1_, subtestent0_.id1 "
+                        + "as id2_1_, subtestent0_.id2 as id3_1_ from SubTestEntity subtestent0_ inner "
+                        + "join `test_table` testentity1_ on subtestent0_.id1=testentity1_.`ID1`"
+                        + " and subtestent0_.id2=testentity1_.id2");
+    }
 
-  private void openSessionAndDo(Consumer<Session> func) {
-    Session session = this.metadata.buildSessionFactory().openSession();
-    session.beginTransaction();
-    func.accept(session);
-    session.close();
-  }
+    private void openSessionAndDo(Consumer<Session> func) {
+        Session session = this.metadata.buildSessionFactory().openSession();
+        session.beginTransaction();
+        func.accept(session);
+        session.close();
+    }
 
-  private void testStatementTranslation(Consumer<Session> hibernateOperation,
+    private void testStatementTranslation(Consumer<Session> hibernateOperation,
       String executedStatement) {
     openSessionAndDo(hibernateOperation);
 
@@ -151,13 +152,13 @@ public class GeneratedSelectStatementsTests {
     assertThat(statements.get(0)).isEqualTo(executedStatement);
   }
 
-  private void testUpdateStatementTranslation(String updateStatement,
+    private void testUpdateStatementTranslation(String updateStatement,
       String expectedDatabaseStatement) {
     testStatementTranslation(x -> x.createQuery(updateStatement).executeUpdate(),
         expectedDatabaseStatement);
   }
 
-  private void testReadStatementTranslation(String readStatement,
+    private void testReadStatementTranslation(String readStatement,
       String expectedDatabaseStatement) {
     testStatementTranslation(x -> x.createQuery(readStatement).list(), expectedDatabaseStatement);
   }

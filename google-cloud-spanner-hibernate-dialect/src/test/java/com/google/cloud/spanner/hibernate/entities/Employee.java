@@ -28,24 +28,23 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * A test entity that uses features in Hibernate that are unsupported in Spanner.
- *
+ * A test entity that uses features in Hibernate that are unsupported in
+ * Spanner.
+ * 
  * @author Daniel Zou
  * @author Chengyuan Zhao
  */
 @Entity
-@Table(indexes = {
-    @Index(columnList = "name", name = "name_index")
-})
+@Table(indexes = { @Index(columnList = "name", name = "name_index") })
 public class Employee {
 
-  @Id
-  @GeneratedValue
-  public Long id;
+    @Id
+    @GeneratedValue
+    public Long id;
 
-  @ManyToOne(cascade = {CascadeType.ALL})
-  public Employee manager;
+    @ManyToOne(cascade = { CascadeType.ALL })
+    public Employee manager;
 
-  @Column(unique = true)
-  public String name;
+    @Column(unique = true)
+    public String name;
 }

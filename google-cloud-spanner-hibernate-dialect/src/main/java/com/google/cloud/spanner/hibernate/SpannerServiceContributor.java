@@ -22,20 +22,22 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.spi.ServiceContributor;
 
 /**
- * An implementation of a Hibernate {@link ServiceContributor} which provides a "userAgent" JDBC
- * connection property to the Spanner JDBC driver to identify the library.
- *
- * <p>Note that Hibernate will automatically pass down all "hibernate.connection.*" properties
- * without the prefix to {@code Driver.connect(url, props)}.
- *
+ * An implementation of a Hibernate {@link ServiceContributor} which provides a
+ * "userAgent" JDBC connection property to the Spanner JDBC driver to identify
+ * the library.
+ * 
+ * <p>
+ * Note that Hibernate will automatically pass down all "hibernate.connection.*"
+ * properties without the prefix to {@code Driver.connect(url, props)}.
+ * 
  * @author Mike Eltsufin
  */
 public class SpannerServiceContributor implements ServiceContributor {
 
-  static final String HIBERNATE_API_CLIENT_LIB_TOKEN = "sp-hib";
+    static final String HIBERNATE_API_CLIENT_LIB_TOKEN = "sp-hib";
 
-  public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
-    serviceRegistryBuilder
-        .applySetting("hibernate.connection.userAgent", HIBERNATE_API_CLIENT_LIB_TOKEN);
-  }
+    public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
+        serviceRegistryBuilder.applySetting("hibernate.connection.userAgent",
+                HIBERNATE_API_CLIENT_LIB_TOKEN);
+    }
 }

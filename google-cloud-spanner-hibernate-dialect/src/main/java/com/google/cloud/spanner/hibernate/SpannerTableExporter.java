@@ -35,27 +35,28 @@ import org.hibernate.tool.schema.spi.Exporter;
 
 /**
  * The exporter for Cloud Spanner CREATE and DROP table statements.
- *
+ * 
  * @author Chengyuan Zhao
  */
 public class SpannerTableExporter implements Exporter<Table> {
 
-  private final SpannerDialect spannerDialect;
+    private final SpannerDialect spannerDialect;
 
-  private final String createTableTemplate;
+    private final String createTableTemplate;
 
-  /**
-   * Constructor.
-   *
-   * @param spannerDialect a Cloud Spanner dialect.
-   */
-  public SpannerTableExporter(SpannerDialect spannerDialect) {
-    this.spannerDialect = spannerDialect;
-    this.createTableTemplate =
-        this.spannerDialect.getCreateTableString() + " {0} ({1}) PRIMARY KEY ({2})";
-  }
+    /**
+     * Constructor.
+     * 
+     * @param spannerDialect
+     *            a Cloud Spanner dialect.
+     */
+    public SpannerTableExporter(SpannerDialect spannerDialect) {
+        this.spannerDialect = spannerDialect;
+        this.createTableTemplate = this.spannerDialect.getCreateTableString()
+                + " {0} ({1}) PRIMARY KEY ({2})";
+    }
 
-  @Override
+    @Override
   public String[] getSqlCreateStrings(Table table, Metadata metadata) {
     /* The current implementation does not support UNIQUE constraints/indexes for relationships */
 
@@ -76,7 +77,7 @@ public class SpannerTableExporter implements Exporter<Table> {
     return getTableString(table, metadata, keyColumns);
   }
 
-  private String[] getTableString(Table table, Metadata metadata, Iterable<Column> keyColumns) {
+    private String[] getTableString(Table table, Metadata metadata, Iterable<Column> keyColumns) {
 
     String primaryKeyColNames = StreamSupport.stream(keyColumns.spliterator(), false)
         .map(Column::getQuotedName)
@@ -102,32 +103,36 @@ public class SpannerTableExporter implements Exporter<Table> {
     return statements.toArray(new String[0]);
   }
 
-  private Table getContainingTableForCollection(Metadata metadata, Table collectionTable) {
-    for (Collection collection : metadata.getCollectionBindings()) {
-      if (collection.getCollectionTable().equals(collectionTable)) {
-        return collection.getTable();
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public String[] getSqlDropStrings(Table table, Metadata metadata) {
-    /* Cloud Spanner requires examining the metadata to find all indexes and interleaved tables.
-     * These must be dropped before the given table can be dropped.
-     * The current implementation does not support interleaved tables.
-     */
-
-    ArrayList<String> dropStrings = new ArrayList<>();
-
-    Iterator<Index> iteratorIdx = table.getIndexIterator();
-    while (iteratorIdx.hasNext()) {
-      Index curr = iteratorIdx.next();
-      dropStrings.add("drop index " + curr.getName());
+    private Table getContainingTableForCollection(Metadata metadata,
+            Table collectionTable) {
+        for (Collection collection : metadata.getCollectionBindings()) {
+            if (collection.getCollectionTable().equals(collectionTable)) {
+                return collection.getTable();
+            }
+        }
+        return null;
     }
 
-    dropStrings.add(this.spannerDialect.getDropTableString(table.getQuotedName()));
+    @Override
+    public String[] getSqlDropStrings(Table table, Metadata metadata) {
+        /*
+         * Cloud Spanner requires examining the metadata to find all indexes and
+         * interleaved tables. These must be dropped before the given table can
+         * be dropped. The current implementation does not support interleaved
+         * tables.
+         */
 
-    return dropStrings.toArray(new String[0]);
-  }
+        ArrayList<String> dropStrings = new ArrayList<>();
+
+        Iterator<Index> iteratorIdx = table.getIndexIterator();
+        while (iteratorIdx.hasNext()) {
+            Index curr = iteratorIdx.next();
+            dropStrings.add("drop index " + curr.getName());
+        }
+
+        dropStrings.add(this.spannerDialect.getDropTableString(table
+                .getQuotedName()));
+
+        return dropStrings.toArray(new String[0]);
+    }
 }
