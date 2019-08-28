@@ -13,7 +13,7 @@
     <name>Google Cloud Spanner Dialect for Hibernate ORM</name>
 
     <scm>
-        <connection>scm:git:git@github.com:linqia/blog-discovery.git</connection>
+        <connection>scm:git:git@github.com:saurabhLinqia/google-cloud-spanner-hibernate.git</connection>
         <tag>google-hibernate-dialect-0.1.0</tag>
     </scm>
 
